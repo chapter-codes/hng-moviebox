@@ -2,7 +2,6 @@
 import Imdb from '../../assets/imdb.svg'
 import Tomato from '../../assets/tomato.svg'
 
-console.log(Imdb, Tomato)
 
 
 export default function MovieCard({movie}) {
@@ -10,7 +9,7 @@ export default function MovieCard({movie}) {
 
     const date= new Date(release_date)
     const releaseUTCYear= date.getUTCFullYear()
-    const imageUrl='https://image.tmdb.org/t/p/original'
+    const imageUrl='https://image.tmdb.org/t/p/w300'
 
   return (
    <div data-testid='movie-card'>

@@ -16,7 +16,7 @@ export default function Poster({poster}) {
   return (<>
     <div className={`poster  w-full  bg-gray-500  bg-[url('${'https://image.tmdb.org/t/p/original'+ backdrop_path}')] relative`}>
     <img 
-        className='absolute h-auto w-full max-h-[600px]  top-0 left-0 h-full'
+        className='absolute h-auto w-full max-h-[600px]  top-0 left-0 h-full object-cover'
     src={imageBaseUrl+ backdrop_path } alt="poster"  />
 
 

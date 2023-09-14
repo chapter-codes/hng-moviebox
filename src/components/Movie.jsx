@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import Loading from "./Loading"
+import ErrorFallback from "./ErrorFallback"
+import {useParams} from 'react-router-dom'
 
 import Logo from '../assets/tv.svg'
 import Home from '../assets/Home.svg'
@@ -9,6 +11,8 @@ import TVShow from '../assets/TV Show.svg'
 import Calendar from '../assets/Calendar.svg'
 import Logout from '../assets/Logout.svg'
 import Play from '../assets/Play.svg'
+import Star from '../assets/Star.svg'
+
 
 
 
@@ -16,26 +20,43 @@ import Play from '../assets/Play.svg'
 export default function Movie() {
     const [movie, setMovie]= useState('')
     const [loading, setLoading]= useState(true)
+    const [error, setError]= useState(false)
+
+    const {movieId}= useParams()
+    console.log(movieId)
+
     
-    const movieUrl='https://api.themoviedb.org/3/movie/615656'
-    const imageBaseUrl='https://image.tmdb.org/t/p/original'
+    const imageBaseUrl='https://image.tmdb.org/t/p/w-500/'
     
     const releaseDate= movie? movie.release_date :''
     const utcYear= releaseDate? new Date(releaseDate).getUTCFullYear() : ''
 
     useEffect(()=>{
-        loadMovie(movieUrl)
-        .then(res=> {
-            setMovie({...res.data})
-            setLoading(false)
+        if(error) return ;
+        loadMovie(movieId)
+        .then(movie=> {
+            console.log(movie)
+            loadMovieCredits(movie.data.belongs_to_collection.id)
+            .then(credits=>{
+                console.log(credits)
+                setMovie({...movie.data, ...credits})
+                setLoading(false)
+            })
+            .catch(err=>{
+                console.log('credits error', err)
+                setError(err)
+            })
         })
-        .catch(err=>console.log(err))
+        .catch(err=>{
+            console.log(err)
+            setError(err)
+        })
 
 
-    },[])
+    },[error])
 
   return (
-
+    error? <ErrorFallback err={error} setError={setError} /> :
     loading? <Loading /> : 
     <div className="flex h-screen w-full "> 
        <div className="sidebar flex flex-col w-auto justify-evenly rounded-3xl border-r-[1px] border-black ">
@@ -60,9 +81,9 @@ export default function Movie() {
         <p  className="font-bold flex items-center text-[#666666]  pl-8 py-2"><img  className="w-[40px] h-[40px] pr-4"src={Logout} alt="home icon" />Logout</p>
        </div>
 
-        <div className="movie  grow px-20 pt-8">
-            <div className={`poster w-full h-[40vh] md:h-[50vh] relative md:h-[60vh]  `}>
-                <img className='absolute w-full  h-full top-0 left-0 rounded-2xl overflow-hidden' src={imageBaseUrl+ movie.backdrop_path} alt="movie poster" />
+        <div className="movie  grow px-2 pt-8 md:px-8">
+            <div className={`poster w-full h-[40vh] md:h-[50vh] relative`}>
+                <img className='absolute w-full  h-full top-0 left-0 rounded-2xl overflow-hidden object-cover' src={imageBaseUrl+ movie.backdrop_path} alt="movie poster" />
 
                 <div className="watch-trailer absolute w-full h-full flex flex-col justify-center items-center top-0 left-0">
                 <   div className="play flex items-center justify-center rounded-full w-20 h-20 bg-[#E5E7EB] opacity-60 hover:opacity-80">
@@ -81,15 +102,32 @@ export default function Movie() {
                     <p className="text-[#404040] text-sm">{movie.adult?'PG-18': 'PG-13'}</p>
                     <div className="dot text-[#404040] text-[1.5rem] leading-[9px] font-bold">.</div>
                     <p className="text-[#404040] text-sm" data-testid='movie-runtime'>{String(Math.floor(movie.runtime/60)).padStart(2,0)+'m'}  {String(Math.floor(movie.runtime%60)).padStart(2, '0') +'m'}</p>
-                    {
-                        movie.genres.map(genre=><p className="" key={genre.id}>{genre.name}</p>)
-                    }
-                    <p className=""></p>
-                    <p className=""></p>
+                    <div className="flex items-center gap-2">
+                        {
+                            movie.genres.map(genre=><p className="text-[#B91C1C] text-[10px] py-1 font-bold border-[1px] border-[#F8E7EB] rounded-full  px-2" key={genre.id}>{genre.name}</p>)
+                        }    
 
+                    </div>
+            
+
+                </div>
+                <div className="left flex justify-center items-center gap-2">
+                    <img src={Star} alt="rating" className="w-[20px] h-[20px]" />
+                    <p className="text-[#E8E8E8] text-xs">{movie.vote_average.toFixed(1)}</p>
+                    <p className="text-[#666666] text-sm font-bold pl-2 border-l-[2px] ">{Math.floor(movie.vote_count/1000)}K</p>
                 </div>
 
 
+            </div>
+            <div className="overview-section flex">
+                <div className="left ">
+                    <p className="overview text-[#333333]">{movie.overview}</p>
+
+
+                </div>
+                <div className="right">
+
+                </div>
             </div>
 
         </div>
@@ -101,7 +139,23 @@ export default function Movie() {
 
 
 
-async function loadMovie(url){    
+async function loadMovie(movieId){    
+    const movieUrl='https://api.themoviedb.org/3/movie/'+movieId
+    console.log(movieUrl)
+    const headers=
+     {
+       accept: 'application/json',
+       Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2NWJhNDE3ZTc1NjU5ZDFkZWMyOTFjMjNjNWNjZTE3OCIsInN1YiI6IjYxZWI3N2U0OTQ0YTU3MDA0MzVhMWI1MyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.tEewROreqmHUdeZTmHH43RzySOLrmETYMGMToI_-Zw8'
+     }
+     
+ 
+     const movies= await axios.get(movieUrl,[headers] )
+     return movies 
+ 
+ }
+
+ async function loadMovieCredits(moviId){    
+    const creditsUrl=`https://api.themoviedb.org/3/movie/${moviId}/credits?api_key=65ba417e75659d1dec291c23c5cce178`
    
     const headers=
      {
@@ -110,11 +164,11 @@ async function loadMovie(url){
      }
      
  
-     const movies= await axios.get(url,[headers] )
-     return movies 
+     const credits= await axios.get(creditsUrl, [headers] )
+     return credits 
  
  }
-
+ 
 
 //  {
 //     "adult": false,
@@ -212,4 +266,4 @@ async function loadMovie(url){
 //     "video": false,
 //     "vote_average": 7.02,
 //     "vote_count": 1669
-// }
+// // }

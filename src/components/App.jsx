@@ -1,16 +1,12 @@
 import {useState, useEffect} from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import axios from 'axios'
+
 import Loading from './Loading'
 import Poster from './Poster'
 import Movies from './Movies'
 import Footer from './standalone/Footer'
-
-
-
-import axios from 'axios'
-
-axios.defaults.baseURL ='https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1'
-
-
+import ErrorFallback from './ErrorFallback'
 
 
 
@@ -18,6 +14,8 @@ export default function App (){
     const [loading, setLoading]=useState(true)
     const [poster, setPoster]=useState('')
     const [movies, setMovies]    =useState('')
+    const [error, setError]    =useState(false)
+
  
    
 
@@ -36,31 +34,37 @@ export default function App (){
                 setLoading(false)
                 
             })
-            .catch(err=>console.log(err))
+            .catch(err=> setError(err))
 
         // posterLoaded && moviesLoaded? setLoading(false): setLoading(true)
 
-    }, [])
+    }, [error])
 
   return(
-    <>
-      {
-      
-      loading? <><Loading /></>:
-      <>
-        <Poster poster={poster}  />
-        <Movies movies={movies}   />
-        <Footer />
-      
+    <ErrorBoundary 
+        FallbackComponent={ErrorFallback}
+        onReset={()=>null } 
+        // resetKeys={[someKey]}
+     >
+
+
+        {
+        error?<ErrorFallback err={error} setError={setError}/>
+
+       : loading? <><Loading /></>:
+        <>
+          <Poster poster={poster}  />
+          <Movies movies={movies}   />
+          <Footer />
         
-      </>
-      }  
-    </>
+          
+        </>
+        }  
+   </ErrorBoundary>
   )
 
 
 }
-
 
 async function loadMovies(url){    
    
