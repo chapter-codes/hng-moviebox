@@ -1,5 +1,5 @@
 import MovieCard  from './standalone/MovieCard'
-import ChevronRight from '../assets/chevron-right.svg'
+import ChevronRight from '../assets/Chevron right.svg'
 
 export default function Movies({movies}) {
    console.log(movies)

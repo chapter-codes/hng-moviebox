@@ -9,18 +9,15 @@ import WatchTrailer from '../assets/watch-trailer.svg'
 
 
 
-
-
-
 export default function Poster({poster}) {
     const {backdrop_path, vote_average, original_title, overview}=poster
-    
+    const imageBaseUrl='https://image.tmdb.org/t/p/original'
 
   return (<>
     <div className={`poster  w-full  bg-gray-500  bg-[url('${'https://image.tmdb.org/t/p/original'+ backdrop_path}')] relative`}>
     <img 
         className='absolute h-auto w-full max-h-[600px]  top-0 left-0 h-full'
-    src={'https://image.tmdb.org/t/p/original'+ backdrop_path } alt="poster"  />
+    src={imageBaseUrl+ backdrop_path } alt="poster"  />
 
 
     <Header />
