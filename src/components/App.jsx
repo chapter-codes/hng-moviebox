@@ -7,6 +7,7 @@ import Poster from './Poster'
 import Movies from './Movies'
 import Footer from './standalone/Footer'
 import ErrorFallback from './ErrorFallback'
+// import SearchPage from './SearchPage'
 
 
 
@@ -15,6 +16,7 @@ export default function App (){
     const [poster, setPoster]=useState('')
     const [movies, setMovies]    =useState('')
     const [error, setError]    =useState(false)
+    const [searchText, setSearchText] = useState('')
 
  
    
@@ -36,35 +38,34 @@ export default function App (){
             })
             .catch(err=> setError(err))
 
-        // posterLoaded && moviesLoaded? setLoading(false): setLoading(true)
-
     }, [error])
 
   return(
-    <ErrorBoundary 
-        FallbackComponent={ErrorFallback}
-        onReset={()=>null } 
-        // resetKeys={[someKey]}
-     >
-
-
+    <>
         {
         error?<ErrorFallback err={error} setError={setError}/>
 
        : loading? <><Loading /></>:
         <>
-          <Poster poster={poster}  />
-          <Movies movies={movies}   />
+              <Poster poster={poster} searchText={searchText} setSearchText={setSearchText} />
+              {
+                // searchText ? <SearchPage searchText={searchText} /> : <Movies movies={movies} />
+                <Movies movies={movies}   />
+                
+
+              }
+              
           <Footer />
         
           
         </>
-        }  
-   </ErrorBoundary>
+}
+</>
   )
 
 
 }
+{/*   */}
 
 async function loadMovies(url){    
    

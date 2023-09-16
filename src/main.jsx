@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import App from './App.jsx'
 import Movie from './components/Movie'
-import ErrorPage from "./ErrorPage";
+import RouteErrorPage from "./RouteErrorPage.jsx";
 
 import './index.css'
 
@@ -20,7 +20,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App /> ,
-    errorElement: <ErrorPage />,
+    errorElement: <RouteErrorPage />,
 
   },
   {

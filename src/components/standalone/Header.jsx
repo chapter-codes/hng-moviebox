@@ -3,7 +3,8 @@ import SearchIcon from '../../assets/search.svg'
 import MenuIcon from '../../assets/Menu.svg'
 
 
-export default function Header() {
+export default function Header({ searchText, setSearchText }) {
+    // console.log(setSearchText)
     return (
       <>
             <div className=" py-4 px-8 header w-full flex justify-evenly items-center gap-3 relative z-10">
@@ -17,7 +18,8 @@ export default function Header() {
                       name="search-movie" 
                       id="search-movie"
                       placeholder='What do you want to watch?' 
-                      onChange={HandleMovieSearch}
+                        onChange={(event) => setSearchText(event.target.value)}
+                        value={searchText}
                    />
                   <img className='w-[12px] h-[12px]' src={SearchIcon} alt="search icon" />
               </div>
